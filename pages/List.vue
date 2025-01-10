@@ -32,7 +32,14 @@ function deleteNote(id: number) {
 
         <div class="todo" v-for="todo in note.todo" :key="todo.name">
           <div class="todo-item">
-            <input type="checkbox" :checked="todo.checkbox" class="checkbox" disabled>
+            <input
+                type="checkbox"
+                :id="'checkbox-' + note.id + '-' + todo.name"
+                :name="'checkbox-' + note.id + '-' + todo.name"
+                :checked="todo.checkbox"
+                class="checkbox"
+                disabled
+            >
             <p class="todo-name">{{ todo.name }}</p>
           </div>
         </div>

@@ -1,4 +1,6 @@
 import {defineStore} from "pinia";
+import type {IToDoItem} from "~/models/IToDoItem";
+import type {INote} from "~/models/INote";
 
 export const useListStore = defineStore('listStore', {
     state: () => ({
@@ -11,8 +13,8 @@ export const useListStore = defineStore('listStore', {
                 todo: [
                     {name: '1', checkbox: false,},
                     {name: '2', checkbox: false,},
-                ]
-            },
+                ] as IToDoItem[],
+            } as INote,
             {
                 id: 2,
                 name: '2name',
@@ -21,15 +23,14 @@ export const useListStore = defineStore('listStore', {
                 todo: [
                     {name: '1', checkbox: false,},
                     {name: '2', checkbox: false,},
-                ]
-            },
+                ] as IToDoItem[],
+            } as INote,
         ],
-
     }),
 
     actions: {
-        createNote(newNoteId: number) {
-            const newNote = {
+        createNote(): number {
+            const newNote: INote = {
                 id: this.notes.length ? this.notes[this.notes.length - 1].id + 1 : 1,
                 name: '',
                 todo: [],
@@ -39,6 +40,20 @@ export const useListStore = defineStore('listStore', {
             this.notes.push(newNote);
             this.saveState();
             return newNote.id;
+        },
+
+        addToDoItem(noteId: number): IToDoItem | null {
+            const newToDo: IToDoItem = {
+                name: '',
+                checkbox: false,
+            };
+            const note = this.notes.find(note => note.id === noteId);
+            if (note) {
+                this.saveState();
+                return newToDo;
+            } else {
+                return null;
+            }
         },
 
         deleteNote(id: number) {
@@ -56,5 +71,10 @@ export const useListStore = defineStore('listStore', {
                 this.notes = JSON.parse(savedNotes);
             }
         }
-    }
+    },
+    getters: {
+        currentNote: (state) => {
+            return (id: number) => state.notes.find(note => note.id === id);
+        },
+    },
 })
