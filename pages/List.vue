@@ -2,6 +2,15 @@
 const list = useListStore();
 const router = useRouter();
 
+onMounted(() => {
+  list.loadState();
+});
+
+function createNote() {
+  const newNoteId = list.createNote();
+  router.push(`/edit/${newNoteId}`);
+}
+
 function editNote(id: number) {
   router.push(`/edit/${id}`);
 }
@@ -14,7 +23,7 @@ function deleteNote(id: number) {
 </script>
 
 <template>
-  <button class="new-note">перейти к созданию новой заметки</button>
+  <button class="new-note" @click="createNote()">перейти к созданию новой заметки</button>
 
   <div class="container">
     <div class="note" v-for="note in list.notes" :key="note.name">
@@ -46,7 +55,7 @@ function deleteNote(id: number) {
 
 .container {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin: 0 auto;
   max-width: 1200px;

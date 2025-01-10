@@ -8,11 +8,12 @@ const list = useListStore();
   <div class="container">
     <div class="note">
       <div class="title">
-        Name
+        <input type="text">Name
+
         <div class="todo">
           <div class="todo-item">
             <input type="checkbox" class="checkbox">
-            <p class="todo-name">Name todo</p>
+            <input type="text" class="todo-name">Name todo
 
             <div class="todo-actions">
               <button class="todo-action">добавить</button>
@@ -24,7 +25,7 @@ const list = useListStore();
 
           <div class="todo-item">
             <input type="checkbox" class="checkbox">
-            <p class="todo-name">Name todo</p>
+            <input type="text" class="todo-name">Name todo
 
             <div class="todo-actions">
               <button class="todo-action">добавить</button>
