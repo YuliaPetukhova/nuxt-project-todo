@@ -7,17 +7,7 @@ export const useListStore = defineStore('listStore', {
         notes: [
             {
                 id: 1,
-                name: '1name',
-                buttonEdit: 'перейти к изменению',
-                buttonDelete: 'удалить (необходимо подтверждение)',
-                todo: [
-                    {name: '1', checkbox: false,},
-                    {name: '2', checkbox: false,},
-                ] as IToDoItem[],
-            } as INote,
-            {
-                id: 2,
-                name: '2name',
+                name: '',
                 buttonEdit: 'перейти к изменению',
                 buttonDelete: 'удалить (необходимо подтверждение)',
                 todo: [
@@ -61,8 +51,16 @@ export const useListStore = defineStore('listStore', {
             this.saveState();
         },
 
+        updateNote(updatedNote: INote) {
+            const index = this.notes.findIndex(note => note.id === updatedNote.id);
+            if (index !== -1) {
+                this.notes[index] = updatedNote;
+            }
+        },
+
         saveState() {
             localStorage.setItem('listNotes', JSON.stringify(this.notes));
+
         },
 
         loadState() {

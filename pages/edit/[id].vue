@@ -6,18 +6,26 @@ const list = useListStore();
 const router = useRouter();
 const route = useRoute();
 
-const currentNote = ref<INote | null>(null);
+const noteId = computed(() => Array.isArray(route.params.id) ? parseInt(route.params.id[0], 10) : parseInt(route.params.id, 10));
+const currentNote = ref<INote>();
+const originalNote = ref<INote>();
 
 onMounted(() => {
-  const noteId = Array.isArray(route.params.id) ? parseInt(route.params.id[0], 10) : parseInt(route.params.id, 10);
-  const note = list.currentNote!(noteId);
+  const note = list.currentNote(noteId.value);
   if (note) {
-    currentNote.value = note;
+    currentNote.value = {...note};
+    originalNote.value = {...note};
   }
 });
 
 function saveChangedNote() {
-  router.push(`/list`);
+  {
+    if (currentNote.value) {
+      list.updateNote(currentNote.value);
+      list.saveState();
+      router.push(`/list`);
+    }
+  }
 }
 
 function addToDoItem() {
@@ -36,6 +44,21 @@ function deleteToDoItem(todo: IToDoItem) {
       currentNote.value.todo.splice(index, 1);
       list.saveState();
     }
+  }
+}
+
+function deleteUpdatedNote() {
+  if (currentNote.value && confirm('Are you sure you want to delete this note?')) {
+    list.deleteNote(currentNote.value.id);
+    list.saveState();
+    router.push(`/list`);
+  }
+}
+
+function cancelEditingNote() {
+  if (originalNote.value && confirm('Are you sure you want to discard changes?')) {
+    currentNote.value = {...originalNote.value};
+    router.push(`/list`);
   }
 }
 </script>
@@ -57,15 +80,15 @@ function deleteToDoItem(todo: IToDoItem) {
           <div class="todo-item">
             <input
                 type="checkbox"
-                :id="'todoCheckbox' + todo.name"
-                :name="'todoCheckbox' + todo.name"
+                :id="'todoCheckbox-' + currentNote.id + '-' + todo.name"
+                :name="'todoCheckbox-' + currentNote.id + '-' + todo.name"
                 class="checkbox"
                 v-model="todo.checkbox"
                 :checked="todo.checkbox">
             <input
                 type="text"
-                :id="'todoName' + todo.name"
-                :name="'todoName' + todo.name"
+                :id="'todoName-' + currentNote.id + '-' + todo.name"
+                :name="'todoName-' + currentNote.id + '-' + todo.name"
                 class="todo-name"
                 v-model="todo.name"
             >
@@ -80,8 +103,9 @@ function deleteToDoItem(todo: IToDoItem) {
         <div class="actions">
           <button @click="saveChangedNote" class="button-action">сохранить изменения</button>
 
-          <button class="button-action">отменить редактирование (необходимо подтверждение)</button>
-          <button class="button-action">удалить (необходимо подтверждение)</button>
+          <button class="button-action" @click="cancelEditingNote">отменить редактирование (необходимо подтверждение)
+          </button>
+          <button class="button-action" @click="deleteUpdatedNote">удалить (необходимо подтверждение)</button>
           <!--          <button class="button-action">отменить внесенное изменение</button>-->
           <!--          <button class="button-action">повторить отмененное изменение</button>-->
         </div>
