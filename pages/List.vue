@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 const list = useListStore();
 const router = useRouter();
 
@@ -7,8 +8,7 @@ onMounted(() => {
 });
 
 function createNote() {
-  const newNoteId = list.createNote();
-  router.push(`/edit/${newNoteId}`);
+  router.push(`/create`);
 }
 
 function editNote(id: number) {
@@ -16,14 +16,14 @@ function editNote(id: number) {
 }
 
 function deleteNote(id: number) {
-  if (confirm('Are you sure you want to delete this note?')) {
+  if (confirm('Вы действительно хотите удалить заметку?')) {
     list.deleteNote(id);
   }
 }
 </script>
 
 <template>
-  <button class="new-note" @click="createNote()">перейти к созданию новой заметки</button>
+  <button class="new-note" @click="createNote()">Создать</button>
 
   <div class="container">
     <div class="note" v-for="note in list.notes" :key="note.name">
@@ -45,8 +45,8 @@ function deleteNote(id: number) {
         </div>
 
         <div class="actions">
-          <button @click="editNote(note.id)" class="button-action">{{ note.buttonEdit }}</button>
-          <button @click="deleteNote(note.id)" class="button-action">{{ note.buttonDelete }}</button>
+          <button @click="editNote(note.id)" class="button-action">Редактировать</button>
+          <button @click="deleteNote(note.id)" class="button-action">Удалить</button>
         </div>
 
       </div>

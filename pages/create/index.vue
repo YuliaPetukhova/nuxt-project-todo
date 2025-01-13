@@ -3,22 +3,21 @@ import type {INote} from "~/models/INote";
 import type {IToDoItem} from "~/models/IToDoItem";
 
 const storeNotes = useListStore();
+const noteId = storeNotes.createNote();
 const router = useRouter();
-const route = useRoute();
 
-const noteId = computed(() => Array.isArray(route.params.id) ? parseInt(route.params.id[0], 10) : parseInt(route.params.id, 10));
 const currentNote = ref<INote>();
 const originalNote = ref<INote>();
 
 onMounted(() => {
-  const note = storeNotes.currentNote(noteId.value);
+  const note = storeNotes.currentNote(noteId);
   if (note) {
     currentNote.value = {...note};
     originalNote.value = {...note};
   }
 });
 
-function saveNote() {
+function saveChangedNote() {
   if (currentNote.value) {
     storeNotes.updateNote(currentNote.value);
     router.push(`/list`);
@@ -33,16 +32,16 @@ function addToDoItem() {
 
 function deleteToDoItem(todo: IToDoItem) {
   if (currentNote.value) {
-    storeNotes.deleteToDoItem(currentNote.value.id, todo);
     const index = currentNote.value.todo.indexOf(todo);
     if (index > -1) {
       currentNote.value.todo.splice(index, 1);
+      storeNotes.saveState();
     }
   }
 }
 
 function deleteNote() {
-  if (currentNote.value && confirm('Вы действительно хотите удалить заметку?')) {
+  if (currentNote.value && confirm('Are you sure you want to delete this note?')) {
     storeNotes.deleteNote(currentNote.value.id);
     storeNotes.saveState();
     router.push(`/list`);
@@ -50,15 +49,14 @@ function deleteNote() {
 }
 
 function resetNote() {
-  if (originalNote.value && confirm('Вы действительно хотите отменить изменения?')) {
+  if (originalNote.value && confirm('Are you sure you want to discard changes?')) {
     currentNote.value = {...originalNote.value};
   }
 }
 </script>
 
 <template>
-  <h1>Редактирование заметки</h1>
-
+  <h1>Создание заметки</h1>
   <div class="container" v-if="currentNote">
     <div class="note">
       <div class="title">
@@ -69,35 +67,36 @@ function resetNote() {
             v-model="currentNote.name"
         >
 
-        <div class="todo" v-for="(todo, index) in currentNote.todo" :key="index">
+        <div class="todo" v-for="todo in currentNote.todo" :key="todo.name">
           <div class="todo-item">
             <input
                 type="checkbox"
-                :id="'todoCheckbox-' + currentNote.id + '-' + index"
-                :name="'todoCheckbox-' + currentNote.id + '-' + index"
+                :id="'todoCheckbox-' + currentNote.id + '-' + todo.name"
+                :name="'todoCheckbox-' + currentNote.id + '-' + todo.name"
                 class="checkbox"
                 v-model="todo.checkbox"
                 :checked="todo.checkbox">
             <input
-                type="text" :id="'todoName-' + currentNote.id + '-' + index"
-                :name="'todoName-' + currentNote.id + '-' + index"
+                type="text"
+                :id="'todoName-' + currentNote.id + '-' + todo.name"
+                :name="'todoName-' + currentNote.id + '-' + todo.name"
                 class="todo-name"
                 v-model="todo.name"
             >
 
             <div class="todo-actions">
-              <button class="todo-action-add" @click="deleteToDoItem(todo)">удалить</button>
+              <button class="todo-action" @click="deleteToDoItem(todo)">удалить</button>
             </div>
           </div>
         </div>
-        <button class="todo-action-add" @click="addToDoItem">добавить Todo item</button>
+        <button class="todo-action" @click="addToDoItem">добавить Todo item</button>
 
         <div class="actions">
-          <button @click="saveNote" class="button-action save">сохранить изменения</button>
+          <button @click="saveChangedNote" class="button-action">сохранить изменения</button>
 
-          <button class="button-action reset" @click="resetNote">отменить редактирование
+          <button class="button-action" @click="resetNote">отменить редактирование (необходимо подтверждение)
           </button>
-          <button class="button-action delete" @click="deleteNote">удалить</button>
+          <button class="button-action" @click="deleteNote">удалить (необходимо подтверждение)</button>
         </div>
 
       </div>
@@ -148,36 +147,11 @@ function resetNote() {
 
 .todo-action-add {
   margin: 5px 5px;
-  padding: 10px;
-  font-size: 14px;
-  background-color: #e6e6fa;
-  border-radius: 10px;
-  border: 1px solid #e6e6fa;
-  color: rgba(0, 0, 0, 0.99);
   cursor: pointer;
 }
 
 .button-action {
   margin: 10px 10px 0 0;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 10px;
-  color: #ffffff;
   cursor: pointer;
-}
-
-.reset {
-  background-color: #AECBFA;
-  border: 1px solid #AECBFA;
-}
-
-.delete {
-  background-color: #f28b82;
-  border: 1px solid #f28b82;
-}
-
-.save {
-  background-color: #a8d5ba;
-  border: 1px solid #a8d5ba;
 }
 </style>

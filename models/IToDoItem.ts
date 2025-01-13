@@ -1,4 +1,4 @@
 export interface IToDoItem {
-    name: string | undefined;
+    name: string;
     checkbox: boolean;
 }

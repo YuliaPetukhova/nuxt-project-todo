@@ -4,18 +4,7 @@ import type {INote} from "~/models/INote";
 
 export const useListStore = defineStore('listStore', {
     state: () => ({
-        notes: [
-            {
-                id: 1,
-                name: '',
-                buttonEdit: 'перейти к изменению',
-                buttonDelete: 'удалить (необходимо подтверждение)',
-                todo: [
-                    {name: '1', checkbox: false,},
-                    {name: '2', checkbox: false,},
-                ] as IToDoItem[],
-            } as INote,
-        ],
+        notes: [] as INote[],
     }),
 
     actions: {
@@ -24,25 +13,31 @@ export const useListStore = defineStore('listStore', {
                 id: this.notes.length ? this.notes[this.notes.length - 1].id + 1 : 1,
                 name: '',
                 todo: [],
-                buttonEdit: 'перейти к изменению',
-                buttonDelete: 'удалить (необходимо подтверждение)',
             };
             this.notes.push(newNote);
-            this.saveState();
             return newNote.id;
         },
 
-        addToDoItem(noteId: number): IToDoItem | null {
+        addToDoItem(noteId: number) {
             const newToDo: IToDoItem = {
                 name: '',
                 checkbox: false,
             };
             const note = this.notes.find(note => note.id === noteId);
             if (note) {
+                note.todo.push(newToDo);
                 this.saveState();
-                return newToDo;
-            } else {
-                return null;
+            }
+        },
+
+        deleteToDoItem(noteId: number, todo: IToDoItem) {
+            const note = this.notes.find(note => note.id === noteId);
+            if (note) {
+                const index = note.todo.indexOf(todo);
+                if (index > -1) {
+                    note.todo.splice(index, 1);
+                    this.saveState();
+                }
             }
         },
 
@@ -56,11 +51,12 @@ export const useListStore = defineStore('listStore', {
             if (index !== -1) {
                 this.notes[index] = updatedNote;
             }
+
+            this.saveState();
         },
 
         saveState() {
             localStorage.setItem('listNotes', JSON.stringify(this.notes));
-
         },
 
         loadState() {
