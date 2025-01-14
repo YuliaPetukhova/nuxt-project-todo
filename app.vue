@@ -1,15 +1,7 @@
 <template>
-  <div class="container">
+  <div>
     <LazyNuxtLayout>
       <NuxtPage/>
     </LazyNuxtLayout>
   </div>
 </template>
-
-
-<style scoped>
-.container {
-  margin: 0;
-  padding: 0;
-}
-</style>

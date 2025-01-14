@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-const list = useListStore();
+const storeListNotes = useListStore();
 const router = useRouter();
 
 onMounted(() => {
-  list.loadState();
+  storeListNotes.loadState();
 });
 
 function createNote() {
@@ -17,84 +17,68 @@ function editNote(id: number) {
 
 function deleteNote(id: number) {
   if (confirm('Вы действительно хотите удалить заметку?')) {
-    list.deleteNote(id);
+    storeListNotes.deleteNote(id);
   }
 }
 </script>
 
 <template>
-  <button class="new-note" @click="createNote()">Создать</button>
+  <div>
+    <b-button
+        variant="outline-primary"
+        class="ms-md-3 mt-md-3"
+        @click="createNote()"
+    >
+      Создать
+    </b-button>
 
-  <div class="container">
-    <div class="note" v-for="note in list.notes" :key="note.name">
-      <div class="title">
-        {{ note.name }}
+    <b-container>
+      <b-row>
+        <b-col v-for="note in storeListNotes.notes" :key="note.name" md="4" class="mt-3">
+          <b-card class="h-100 d-flex flex-column">
+            <b-card-title>{{ note.name }}</b-card-title>
 
-        <div class="todo" v-for="todo in note.todo" :key="todo.name">
-          <div class="todo-item">
-            <input
-                type="checkbox"
-                :id="'checkbox-' + note.id + '-' + todo.name"
-                :name="'checkbox-' + note.id + '-' + todo.name"
-                :checked="todo.checkbox"
-                class="checkbox"
-                disabled
-            >
-            <p class="todo-name">{{ todo.name }}</p>
-          </div>
-        </div>
+            <b-card-body d-flex flex-row>
+              <div v-for="(todo, index) in note.todo.slice(0, 3)" :key="index">
+                <div class="d-flex align-items-center mb-2">
+                  <b-form-checkbox
+                      :id="'checkbox-' + note.id + '-' + index"
+                      :name="'checkbox-' + note.id + '-' + index"
+                      :checked="todo.checkbox"
+                      disabled
+                  />
+                  <span>{{ todo.name }}</span>
+              </div>
+              </div>
+              <div v-if="note.todo.length > 3" class="text-muted">
+                +{{ note.todo.length - 3 }} todo
+              </div>
+            </b-card-body>
 
-        <div class="actions">
-          <button @click="editNote(note.id)" class="button-action">Редактировать</button>
-          <button @click="deleteNote(note.id)" class="button-action">Удалить</button>
-        </div>
-
-      </div>
-    </div>
+            <b-card-footer class="bg-transparent border-0 mt-auto">
+              <b-button
+                  variant="primary"
+                  @click="editNote(note.id)"
+                  size="sm"
+                  class="me-2"
+              >
+                Редактировать
+              </b-button>
+              <b-button
+                  variant="danger"
+                  @click="deleteNote(note.id)"
+                  size="sm"
+              >
+                Удалить
+              </b-button>
+            </b-card-footer>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
 <style scoped>
-.new-note {
-  margin: 10px;
-  cursor: pointer;
-}
 
-.container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 0 auto;
-  max-width: 1200px;
-  justify-content: center;
-  align-items: center;
-  justify-items: center;
-  align-content: center;
-}
-
-.note {
-  padding: 10px 10px;
-  border: 1px solid black;
-}
-
-.todo-item {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.checkbox {
-  margin: 0 10px;
-}
-
-.actions {
-  display: flex;
-  flex-direction: row;
-}
-
-.button-action {
-  margin: 0 10px;
-  cursor: pointer;
-}
 </style>

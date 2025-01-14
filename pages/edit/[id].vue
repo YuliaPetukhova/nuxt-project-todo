@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {INote} from "~/models/INote";
-import type {IToDoItem} from "~/models/IToDoItem";
+import type {INote} from "@/models/INote";
+import type {IToDoItem} from "@/models/IToDoItem";
 
 const storeNotes = useListStore();
 const router = useRouter();
@@ -8,6 +8,7 @@ const route = useRoute();
 
 const noteId = computed(() => Array.isArray(route.params.id) ? parseInt(route.params.id[0], 10) : parseInt(route.params.id, 10));
 const currentNote = ref<INote>();
+
 const originalNote = ref<INote>();
 
 onMounted(() => {
@@ -57,127 +58,87 @@ function resetNote() {
 </script>
 
 <template>
-  <h1>Редактирование заметки</h1>
+  <div>
+    <h1 class="p-2 p-sm-3 p-md-4">Редактирование заметки</h1>
 
-  <div class="container" v-if="currentNote">
-    <div class="note">
-      <div class="title">
-        <input
-            type="text"
-            :id="'noteTitle' + currentNote"
-            :name="'noteTitle' + currentNote"
-            v-model="currentNote.name"
-        >
+    <b-container v-if="currentNote">
+      <b-card class="note-card">
+        <b-form-group>
+          <b-form-input
+              :id="'noteTitle' + currentNote"
+              :name="'noteTitle' + currentNote"
+              v-model="currentNote.name"
+              class="mb-3"
+          />
 
-        <div class="todo" v-for="(todo, index) in currentNote.todo" :key="index">
-          <div class="todo-item">
-            <input
-                type="checkbox"
-                :id="'todoCheckbox-' + currentNote.id + '-' + index"
-                :name="'todoCheckbox-' + currentNote.id + '-' + index"
-                class="checkbox"
-                v-model="todo.checkbox"
-                :checked="todo.checkbox">
-            <input
-                type="text" :id="'todoName-' + currentNote.id + '-' + index"
-                :name="'todoName-' + currentNote.id + '-' + index"
-                class="todo-name"
-                v-model="todo.name"
-            >
-
-            <div class="todo-actions">
-              <button class="todo-action-add" @click="deleteToDoItem(todo)">удалить</button>
-            </div>
+          <div v-for="(todo, index) in currentNote.todo" :key="index" class="mb-2">
+            <b-row align-v="center">
+              <b-col cols="auto">
+                <b-form-checkbox
+                    :id="'todoCheckbox-' + currentNote.id + '-' + index"
+                    :name="'todoCheckbox-' + currentNote.id + '-' + index"
+                    v-model="todo.checkbox"
+                    :checked="todo.checkbox"
+                />
+              </b-col>
+              <b-col>
+                <b-form-input
+                    :id="'todoName-' + currentNote.id + '-' + index"
+                    :name="'todoName-' + currentNote.id + '-' + index"
+                    v-model="todo.name"
+                />
+              </b-col>
+              <b-col cols="auto">
+                <b-button
+                    variant="danger"
+                    @click="deleteToDoItem(todo)"
+                    size="sm"
+                >
+                  Удалить
+                </b-button>
+              </b-col>
+            </b-row>
           </div>
-        </div>
-        <button class="todo-action-add" @click="addToDoItem">добавить Todo item</button>
 
-        <div class="actions">
-          <button @click="saveNote" class="button-action save">сохранить изменения</button>
+          <b-button
+              variant="secondary"
+              @click="addToDoItem"
+              class="mt-3 mb-3"
+          >
+            Добавить новый Todo
+          </b-button>
 
-          <button class="button-action reset" @click="resetNote">отменить редактирование
-          </button>
-          <button class="button-action delete" @click="deleteNote">удалить</button>
-        </div>
-
-      </div>
-    </div>
+          <b-row class="mt-4">
+            <b-col>
+                <b-button
+                    variant="success"
+                    @click="saveNote"
+                    class="me-2 mt-2"
+                >
+                  Сохранить изменения
+                </b-button>
+                <b-button
+                    variant="primary"
+                    @click="resetNote"
+                    class="me-2 mt-2"
+                >
+                  Отменить редактирование
+                </b-button>
+                <b-button
+                    variant="danger"
+                    @click="deleteNote"
+                    class="me-2 mt-2"
+                >
+                  Удалить
+                </b-button>
+            </b-col>
+          </b-row>
+        </b-form-group>
+      </b-card>
+    </b-container>
   </div>
 </template>
 
 <style scoped>
-.container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
-  margin: 0 auto;
-  max-width: 1200px;
-  justify-content: center;
-  align-items: center;
-  justify-items: center;
-  align-content: center;
-}
 
-.note {
-  padding: 10px 10px;
-  border: 1px solid black;
-}
-
-.todo-item {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.checkbox {
-  margin: 0 10px;
-}
-
-.actions {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-.todo-actions {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.todo-action-add {
-  margin: 5px 5px;
-  padding: 10px;
-  font-size: 14px;
-  background-color: #e6e6fa;
-  border-radius: 10px;
-  border: 1px solid #e6e6fa;
-  color: rgba(0, 0, 0, 0.99);
-  cursor: pointer;
-}
-
-.button-action {
-  margin: 10px 10px 0 0;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 10px;
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.reset {
-  background-color: #AECBFA;
-  border: 1px solid #AECBFA;
-}
-
-.delete {
-  background-color: #f28b82;
-  border: 1px solid #f28b82;
-}
-
-.save {
-  background-color: #a8d5ba;
-  border: 1px solid #a8d5ba;
-}
 </style>
