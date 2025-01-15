@@ -7,13 +7,11 @@ const noteId = storeNotes.createNote();
 const router = useRouter();
 
 const currentNote = ref<INote>();
-const originalNote = ref<INote>();
 
 onMounted(() => {
   const note = storeNotes.currentNote(noteId);
   if (note) {
     currentNote.value = {...note};
-    originalNote.value = {...note};
   }
 });
 
@@ -25,9 +23,11 @@ function saveChangedNote() {
 }
 
 function addToDoItem() {
-  if (currentNote.value) {
-    storeNotes.addToDoItem(currentNote.value.id);
-  }
+  const newToDo: IToDoItem = {
+    name: '',
+    checkbox: false,
+  };
+  currentNote.value.todo.push(newToDo);
 }
 
 function deleteToDoItem(todo: IToDoItem) {
@@ -41,16 +41,14 @@ function deleteToDoItem(todo: IToDoItem) {
 }
 
 function deleteNote() {
-  if (currentNote.value && confirm('Are you sure you want to delete this note?')) {
-    storeNotes.deleteNote(currentNote.value.id);
-    storeNotes.saveState();
-    router.push(`/list`);
-  }
+  router.push(`/list`);
 }
 
 function resetNote() {
-  if (originalNote.value && confirm('Are you sure you want to discard changes?')) {
-    currentNote.value = {...originalNote.value};
+  if (confirm('Вы действительно хотите отменить изменения?')) {
+    currentNote.value.name = '';
+    currentNote.value.todo = [];
+
   }
 }
 </script>
@@ -140,7 +138,7 @@ function resetNote() {
                   @click="deleteNote"
                   class="me-2 mt-2"
               >
-                удалить
+                отменить создание
               </b-button>
             </b-col>
           </b-row>

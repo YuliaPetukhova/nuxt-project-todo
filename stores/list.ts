@@ -42,12 +42,12 @@ export const useListStore = defineStore('listStore', {
         },
 
         deleteNote(id: number) {
-            this.notes = this.notes.filter(note => note.id !== id);
+            this.notes = this.notes.filter((note: INote) => note.id !== id);
             this.saveState();
         },
 
         updateNote(updatedNote: INote) {
-            const index = this.notes.findIndex(note => note.id === updatedNote.id);
+            const index = this.notes.findIndex((note: INote) => note.id === updatedNote.id);
             if (index !== -1) {
                 this.notes[index] = updatedNote;
             }
@@ -64,11 +64,12 @@ export const useListStore = defineStore('listStore', {
             if (savedNotes) {
                 this.notes = JSON.parse(savedNotes);
             }
-        }
+        },
     },
+
     getters: {
-        currentNote: (state) => {
-            return (id: number) => state.notes.find(note => note.id === id);
+        currentNote: (state) => (id: number): INote | undefined => {
+            return state.notes.find((note: INote) => note.id === id);
         },
     },
 })

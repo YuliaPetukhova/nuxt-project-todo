@@ -7,15 +7,16 @@ const router = useRouter();
 const route = useRoute();
 
 const noteId = computed(() => Array.isArray(route.params.id) ? parseInt(route.params.id[0], 10) : parseInt(route.params.id, 10));
-const currentNote = ref<INote>();
 
+const currentNote = ref<INote>();
 const originalNote = ref<INote>();
 
 onMounted(() => {
+  storeNotes.loadState();
   const note = storeNotes.currentNote(noteId.value);
   if (note) {
-    currentNote.value = {...note};
-    originalNote.value = {...note};
+    currentNote.value = JSON.parse(JSON.stringify(note));
+    originalNote.value = JSON.parse(JSON.stringify(note));
   }
 });
 
@@ -27,9 +28,11 @@ function saveNote() {
 }
 
 function addToDoItem() {
-  if (currentNote.value) {
-    storeNotes.addToDoItem(currentNote.value.id);
-  }
+  const newToDo: IToDoItem = {
+    name: '',
+    checkbox: false,
+  };
+  currentNote.value.todo.push(newToDo);
 }
 
 function deleteToDoItem(todo: IToDoItem) {
@@ -51,10 +54,11 @@ function deleteNote() {
 }
 
 function resetNote() {
-  if (originalNote.value && confirm('Вы действительно хотите отменить изменения?')) {
-    currentNote.value = {...originalNote.value};
+  if (confirm('Вы действительно хотите отменить изменения?')) {
+    currentNote.value = JSON.parse(JSON.stringify(originalNote.value));
   }
 }
+
 </script>
 
 <template>
@@ -110,27 +114,27 @@ function resetNote() {
 
           <b-row class="mt-4">
             <b-col>
-                <b-button
-                    variant="success"
-                    @click="saveNote"
-                    class="me-2 mt-2"
-                >
-                  Сохранить изменения
-                </b-button>
-                <b-button
-                    variant="primary"
-                    @click="resetNote"
-                    class="me-2 mt-2"
-                >
-                  Отменить редактирование
-                </b-button>
-                <b-button
-                    variant="danger"
-                    @click="deleteNote"
-                    class="me-2 mt-2"
-                >
-                  Удалить
-                </b-button>
+              <b-button
+                  variant="success"
+                  @click="saveNote"
+                  class="me-2 mt-2"
+              >
+                Сохранить изменения
+              </b-button>
+              <b-button
+                  variant="primary"
+                  class="me-2 mt-2"
+                  @click="resetNote"
+              >
+                Отменить редактирование
+              </b-button>
+              <b-button
+                  variant="danger"
+                  @click="deleteNote"
+                  class="me-2 mt-2"
+              >
+                Удалить
+              </b-button>
             </b-col>
           </b-row>
         </b-form-group>
