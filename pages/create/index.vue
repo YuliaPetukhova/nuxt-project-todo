@@ -3,8 +3,9 @@ import type {INote} from "@/models/INote";
 import type {IToDoItem} from "@/models/IToDoItem";
 
 const storeNotes = useListStore();
-const noteId = storeNotes.createNote();
 const router = useRouter();
+
+const noteId = storeNotes.createNote();
 
 const currentNote = ref<INote>();
 
@@ -15,7 +16,7 @@ onMounted(() => {
   }
 });
 
-function saveChangedNote() {
+function saveNote() {
   if (currentNote.value) {
     storeNotes.updateNote(currentNote.value);
     router.push(`/list`);
@@ -35,7 +36,6 @@ function deleteToDoItem(todo: IToDoItem) {
     const index = currentNote.value.todo.indexOf(todo);
     if (index > -1) {
       currentNote.value.todo.splice(index, 1);
-      storeNotes.saveState();
     }
   }
 }
@@ -48,7 +48,6 @@ function resetNote() {
   if (confirm('Вы действительно хотите отменить изменения?')) {
     currentNote.value.name = '';
     currentNote.value.todo = [];
-
   }
 }
 </script>
@@ -119,7 +118,7 @@ function resetNote() {
             <b-col>
               <b-button
                   variant="success"
-                  @click="saveChangedNote"
+                  @click="saveNote"
                   class="me-2 mt-2"
               >
                 Сохранить изменения

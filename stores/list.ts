@@ -1,5 +1,4 @@
 import {defineStore} from "pinia";
-import type {IToDoItem} from "~/models/IToDoItem";
 import type {INote} from "~/models/INote";
 
 export const useListStore = defineStore('listStore', {
@@ -18,36 +17,13 @@ export const useListStore = defineStore('listStore', {
             return newNote.id;
         },
 
-        addToDoItem(noteId: number) {
-            const newToDo: IToDoItem = {
-                name: '',
-                checkbox: false,
-            };
-            const note = this.notes.find(note => note.id === noteId);
-            if (note) {
-                note.todo.push(newToDo);
-                this.saveState();
-            }
-        },
-
-        deleteToDoItem(noteId: number, todo: IToDoItem) {
-            const note = this.notes.find(note => note.id === noteId);
-            if (note) {
-                const index = note.todo.indexOf(todo);
-                if (index > -1) {
-                    note.todo.splice(index, 1);
-                    this.saveState();
-                }
-            }
-        },
-
-        deleteNote(id: number) {
-            this.notes = this.notes.filter((note: INote) => note.id !== id);
+        deleteNote(id: number): void {
+            this.notes = this.notes.filter((note: INote): boolean => note.id !== id);
             this.saveState();
         },
 
-        updateNote(updatedNote: INote) {
-            const index = this.notes.findIndex((note: INote) => note.id === updatedNote.id);
+        updateNote(updatedNote: INote): void {
+            const index = this.notes.findIndex((note: INote): boolean => note.id === updatedNote.id);
             if (index !== -1) {
                 this.notes[index] = updatedNote;
             }
@@ -55,12 +31,12 @@ export const useListStore = defineStore('listStore', {
             this.saveState();
         },
 
-        saveState() {
+        saveState(): void {
             localStorage.setItem('listNotes', JSON.stringify(this.notes));
         },
 
-        loadState() {
-            const savedNotes = localStorage.getItem('listNotes');
+        loadState(): void {
+            const savedNotes: string | null = localStorage.getItem('listNotes');
             if (savedNotes) {
                 this.notes = JSON.parse(savedNotes);
             }
@@ -68,8 +44,8 @@ export const useListStore = defineStore('listStore', {
     },
 
     getters: {
-        currentNote: (state) => (id: number): INote | undefined => {
-            return state.notes.find((note: INote) => note.id === id);
+        currentNote: (state: { notes: INote[] }) => (id: number): INote | undefined => {
+            return state.notes.find((note: INote): boolean => note.id === id);
         },
     },
 })

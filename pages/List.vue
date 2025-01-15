@@ -48,7 +48,7 @@ function deleteNote(id: number) {
                       disabled
                   />
                   <span>{{ todo.name }}</span>
-              </div>
+                </div>
               </div>
               <div v-if="note.todo.length > 3" class="text-muted">
                 +{{ note.todo.length - 3 }} todo

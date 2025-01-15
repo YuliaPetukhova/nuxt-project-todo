@@ -37,7 +37,6 @@ function addToDoItem() {
 
 function deleteToDoItem(todo: IToDoItem) {
   if (currentNote.value) {
-    storeNotes.deleteToDoItem(currentNote.value.id, todo);
     const index = currentNote.value.todo.indexOf(todo);
     if (index > -1) {
       currentNote.value.todo.splice(index, 1);
